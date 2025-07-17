@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Interest Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Search Your Interests on Social Media</h1>
+        <div class="search-box">
+            <input type="text" id="interestInput" placeholder="Enter your interest (e.g., cooking, fitness)">
+        </div>
+        <div class="platform-buttons">
+            <button class="platform-btn youtube" onclick="searchPlatform('youtube')">
+                <i class="fab fa-youtube"></i> YouTube
+            </button>
+            <button class="platform-btn facebook" onclick="searchPlatform('facebook')">
+                <i class="fab fa-facebook"></i> Facebook
+            </button>
+            <button class="platform-btn instagram" onclick="searchPlatform('instagram')">
+                <i class="fab fa-instagram"></i> Instagram
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function searchPlatform(platform) {
+            const interest = document.getElementById('interestInput').value.trim();
+            if (!interest) {
+                alert('Please enter an interest to search!');
+                return;
+            }
+
+            let url;
+            switch (platform) {
+                case 'youtube':
+                    url = `https://www.youtube.com/results?search_query=${encodeURIComponent(interest)}`;
+                    break;
+                case 'facebook':
+                    url = `https://www.facebook.com/search/top?q=${encodeURIComponent(interest)}`;
+                    break;
+                case 'instagram':
+                    url = `https://www.instagram.com/explore/tags/${encodeURIComponent(interest.replace(/\s+/g, ''))}/`;
+                    break;
+            }
+
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>
+</html>
